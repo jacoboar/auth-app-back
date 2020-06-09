@@ -1,14 +1,18 @@
-const express           = require('express');
-const router              = express.Router();
-const customMdw           = require('../middleware/custom');
-const SampleController    = require('../controllers/sample')
-const UserController      = require('../controllers/user')
+const express = require('express');
+const router = express.Router();
+const { check } = require('express-validator');
+const userController = require('../controllers/userController');
 
-
-router.post('/login', UserController.login);
-router.post('/register', UserController.register);
-
-router.get('/test', SampleController.unprotected);
-router.get('/protected', customMdw.ensureAuthenticated, SampleController.protected);
+router.post(
+  '/',
+  [
+    check('name', 'Name is required').not().isEmpty(),
+    check('email', 'Add a valid email').isEmail(),
+    check('password', 'The password must be at least 6 characters').isLength({
+      min: 6,
+    }),
+  ],
+  userController.createUser
+);
 
 module.exports = router;
